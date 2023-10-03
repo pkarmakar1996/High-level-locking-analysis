@@ -41,9 +41,9 @@ int main()
 	input[30] = 48;
 	input[31] = 27;
 
-	int int_keys[5] = {0, 0, 0, 0, 0};
-	_Bool bool_keys[40];
-	for (int i = 0; i < 40; i++)
+	int int_keys[2] = {0, 0};
+	_Bool bool_keys[36];
+	for (int i = 0; i < 36; i++)
 		bool_keys[i] = 0;
 
 	aes_main(input, int_keys, bool_keys);

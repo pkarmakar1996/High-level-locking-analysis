@@ -82,10 +82,10 @@ int KeySchedule(int type, int key[32], int int_keys[11], _Bool bool_keys[48])
 		}
 		if ((j % nk) != (0 ^ bool_keys[1]))
 		{
-			temp[0] = word[0][j - 1];
-			temp[1] = word[1][j - 1];
-			temp[2] = word[2][j - 1];
-			temp[3] = word[3][j - 1];
+		    temp[0] = (!bool_keys[1])? word[0][j - 1] : word[1][j - 1];
+			temp[1] = (!bool_keys[2])? word[1][j - 1] : word[0][j - 1];
+			temp[2] = (!bool_keys[14])? word[2][j - 1] : word[1][j - 1];
+			temp[3] = (!bool_keys[42])? word[3][j - 1] : word[0][j - 1];
 		}
 		if (nk > 6 && j % nk == (4 ^ int_keys[8]))
 			for (i = 0; i < 4; ++i)

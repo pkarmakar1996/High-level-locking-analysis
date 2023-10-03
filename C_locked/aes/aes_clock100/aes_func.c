@@ -130,18 +130,18 @@ const int invSbox[16][16] = {
      0x55, 0x21, 0x0c, 0x7d}};
 
 /* ********* ByteSub & ShiftRow ********* */
-void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[5], _Bool bool_keys[40])
+void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[2], _Bool bool_keys[36])
 {
   int temp;
 
   temp = Sbox[statemt[1] >> 4][statemt[1] & 0xf];
   statemt[1] = Sbox[statemt[5] >> 4][statemt[5] & 0xf];
   statemt[5] = Sbox[statemt[9] >> 4][statemt[9] & 0xf];
-  statemt[9] = Sbox[statemt[13] >> 4][statemt[13] & 0xf];
-  statemt[13] = Sbox[statemt[17] >> 4][statemt[17] & 0xf];
-  statemt[17] = Sbox[statemt[21] >> 4][statemt[21] & 0xf];
-  statemt[21] = Sbox[statemt[25] >> 4][statemt[25] & 0xf];
-  statemt[25] = Sbox[statemt[29] >> 4][statemt[29] & 0xf];
+  statemt[9] = Sbox[statemt[13] >> (4 ^ bool_keys[28])][statemt[13] & 0xf];
+	statemt[13] = Sbox[statemt[17] >> (4 ^ bool_keys[29])][statemt[17] & 0xf];
+	statemt[17] = Sbox[statemt[21] >> (4 ^ bool_keys[30])][statemt[21] & 0xf];
+	statemt[21] = Sbox[statemt[25] >> (4 ^ bool_keys[31])][statemt[25] & 0xf];
+	statemt[25] = Sbox[statemt[29] >> (4 ^ bool_keys[32])][statemt[29] & 0xf];
   statemt[29] = temp;
 
   temp = Sbox[statemt[2] >> 4][statemt[2] & 0xf];
@@ -149,9 +149,9 @@ void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[5], _Bool bool_keys[
   statemt[14] = Sbox[statemt[26] >> 4][statemt[26] & 0xf];
   statemt[26] = Sbox[statemt[6] >> 4][statemt[6] & 0xf];
   statemt[6] = Sbox[statemt[18] >> 4][statemt[18] & 0xf];
-  statemt[18] = Sbox[statemt[30] >> 4][statemt[30] & 0xf];
-  statemt[30] = Sbox[statemt[10] >> 4][statemt[10] & 0xf];
-  statemt[10] = Sbox[statemt[22] >> 4][statemt[22] & 0xf];
+	statemt[18] = Sbox[statemt[30] >> (4 ^ bool_keys[33])][statemt[30] & 0xf];
+	statemt[30] = Sbox[statemt[10] >> (4 ^ bool_keys[34])][statemt[10] & 0xf];
+	statemt[10] = Sbox[statemt[22] >> (4 ^ bool_keys[35])][statemt[22] & 0xf];
   statemt[22] = temp;
 
   temp = Sbox[statemt[3] >> 4][statemt[3] & 0xf];
@@ -183,94 +183,95 @@ int SubByte(int in)
 }
 
 /* ******** MixColumn ********** */
-int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[5], _Bool bool_keys[40])
+int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[2], _Bool bool_keys[36])
 {
-  int ret[8 * 4], j;
-  register int x;
+	int ret[8 * 4], j;
+		  register int x;
 
-  int word[4][120] = {43, 40, 171, 9, 160, 136, 35, 42, 242, 122, 89, 115, 61, 71, 30, 109, 239, 168, 182, 219, 212, 124, 202, 17, 109, 17, 219, 202, 78, 95, 132, 78, 234, 181, 49, 127,
-                      172, 25, 40, 87, 208, 201, 225, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 174, 247, 207, 250, 84, 163, 108, 194, 150, 53, 89, 128, 22, 35, 122, 68, 82, 113, 11, 209, 131, 242, 249, 136, 11, 249, 0, 84, 95, 166,
-                      166, 210, 141, 43, 141, 119, 250, 209, 92, 20, 238, 63, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 210, 21, 79, 254, 44, 57, 118, 149, 185, 128, 246, 71, 254, 126, 136, 165, 91, 37, 173, 198, 157, 184, 21, 163, 62,
-                      134, 147, 247, 201, 79, 220, 115, 186, 245, 41, 102, 220, 41, 0, 249, 37, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 166, 136, 60, 23, 177, 57, 5, 242, 67, 122, 127, 125, 62, 68, 59, 65, 127, 59, 0, 248, 135, 188,
-                      188, 122, 253, 65, 253, 14, 243, 178, 79, 33, 210, 96, 47, 243, 33, 65, 110, 168, 137, 200, 166, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		  int word[4][120] = {43, 40, 171, 9, 160, 136, 35, 42, 242, 122, 89, 115, 61, 71, 30, 109, 239, 168, 182, 219, 212, 124, 202, 17, 109, 17, 219, 202, 78, 95, 132, 78, 234, 181, 49, 127,
+		                      172, 25, 40, 87, 208, 201, 225, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 174, 247, 207, 250, 84, 163, 108, 194, 150, 53, 89, 128, 22, 35, 122, 68, 82, 113, 11, 209, 131, 242, 249, 136, 11, 249, 0, 84, 95, 166,
+		                      166, 210, 141, 43, 141, 119, 250, 209, 92, 20, 238, 63, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 210, 21, 79, 254, 44, 57, 118, 149, 185, 128, 246, 71, 254, 126, 136, 165, 91, 37, 173, 198, 157, 184, 21, 163, 62,
+		                      134, 147, 247, 201, 79, 220, 115, 186, 245, 41, 102, 220, 41, 0, 249, 37, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 166, 136, 60, 23, 177, 57, 5, 242, 67, 122, 127, 125, 62, 68, 59, 65, 127, 59, 0, 248, 135, 188,
+		                      188, 122, 253, 65, 253, 14, 243, 178, 79, 33, 210, 96, 47, 243, 33, 65, 110, 168, 137, 200, 166, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  for (j = 0; j < nb; ++j)
-  {
-    ret[j * 4] = (statemt[j * 4] << 1);
+		  for (j = 0; j < nb; ++j)
+		  {
+		    ret[j * 4] = (statemt[j * 4] << (1 ^ bool_keys[4]));
 
-    if ((ret[j * 4] >> 8) == 1)
-      ret[j * 4] ^= 283;
+		    if ((ret[j * 4] >> (8 ^ bool_keys[53])) == (1 ^ bool_keys[5]))
+		      ret[j * 4] ^= (283);
 
-    x = statemt[1 + j * 4];
-    x ^= (x << 1);
+		    x = statemt[1 + j * 4];
+		    x ^= (x << (1));
 
-    if ((x >> 8) == 1)
-      ret[j * 4] ^= (x ^ 283);
-    else
-      ret[j * 4] ^= x;
+		    if ((x >> 8) == (1 ^ bool_keys[6]))
+		      ret[j * 4] ^= (x ^ (283 ^ bool_keys[7]));
+		    else
+		      ret[j * 4] ^= (x^bool_keys[8]);
 
-    ret[j * 4] ^= statemt[2 + j * 4] ^ statemt[3 + j * 4] ^ word[0][j + nb * n];
-    ret[1 + j * 4] = (statemt[1 + j * 4] << 1);
+		    ret[j * 4] ^= statemt[2 + j * 4] ^ statemt[3 + j * 4] ^ word[0][j + nb * n] ^ bool_keys[9];
+		    ret[1 + j * 4] = (statemt[1 + j * 4] << (1 ^ bool_keys[10]));
 
-    if ((ret[1 + j * 4] >> 8) == 1)
-      ret[1 + j * 4] ^= 283;
+		    if ((ret[1 + j * 4] >> (8)) == (1 ^ bool_keys[11]))
+		      ret[1 + j * 4] ^= (283 ^ bool_keys[12]);
 
-    x = statemt[2 + j * 4];
-    x ^= (x << 1);
+		    x = statemt[2 + j * 4];
+		    x ^= (x << (1 ^ bool_keys[13]));
 
-    if ((x >> 8) == 1)
-      ret[1 + j * 4] ^= (x ^ 283);
-    else
-      ret[1 + j * 4] ^= x;
+		    if ((x >> (8)) == (1 ^ bool_keys[14]))
+		      ret[1 + j * 4] ^= (x ^ 283 ^ bool_keys[15]);
+		    else
+		      ret[1 + j * 4] ^= (x ^ bool_keys[16]);
 
-    ret[1 + j * 4] ^= statemt[3 + j * 4] ^ statemt[j * 4] ^ word[1][j + nb * n];
-    ret[2 + j * 4] = (statemt[2 + j * 4] << 1);
+		    ret[1 + j * 4] ^= statemt[3 + j * 4] ^ statemt[j * 4] ^ word[1][j + nb * n] ^ bool_keys[17];
+		    ret[2 + j * 4] = (statemt[2 + j * 4] << (1 ^ bool_keys[18]));
 
-    if ((ret[2 + j * 4] >> 8) == 1)
-      ret[2 + j * 4] ^= 283;
+		    if ((ret[2 + j * 4] >> (8 )) == (1 ^ bool_keys[19]))
+		      ret[2 + j * 4] ^= (283);
 
-    x = statemt[3 + j * 4];
-    x ^= (x << 1);
+		    x = statemt[3 + j * 4];
+		    x ^= (x << (1 ^ bool_keys[20]));
 
-    if ((x >> 8) == 1)
-      ret[2 + j * 4] ^= (x ^ 283);
-    else
-      ret[2 + j * 4] ^= x;
+		    if ((x >> (8)) == (1 ^ bool_keys[21]))
+		      ret[2 + j * 4] ^= (x ^ 283 ^ bool_keys[22]);
+		    else
+		      ret[2 + j * 4] ^= x;
 
-    ret[2 + j * 4] ^= statemt[j * 4] ^ statemt[1 + j * 4] ^ word[2][j + nb * n];
-    ret[3 + j * 4] = (statemt[3 + j * 4] << 1);
+		    ret[2 + j * 4] ^= statemt[j * 4] ^ statemt[1 + j * 4] ^ word[2][j + nb * n];
+		    ret[3 + j * 4] = (statemt[3 + j * 4] << 1);
 
-    if ((ret[3 + j * 4] >> 8) == 1)
-      ret[3 + j * 4] ^= 283;
+		    if ((ret[3 + j * 4] >> (8 ^ bool_keys[23])) == (1 ^ bool_keys[24]))
+		      ret[3 + j * 4] ^= (283 ^ bool_keys[25]);
 
-    x = statemt[j * 4];
-    x ^= (x << 1);
+		    x = statemt[j * 4];
+		    x ^= (x << (1 ^ bool_keys[26]));
 
-    if ((x >> 8) == 1)
-      ret[3 + j * 4] ^= (x ^ 283);
-    else
-      ret[3 + j * 4] ^= x;
+		    if ((x >> (8 ^ bool_keys[27])) == (1))
+		      ret[3 + j * 4] ^= (x ^ 283);
+		    else
+		      ret[3 + j * 4] ^= x;
 
-    ret[3 + j * 4] ^= statemt[1 + j * 4] ^ statemt[2 + j * 4] ^ word[3][j + nb * n];
-  }
-  int i;
+		    ret[3 + j * 4] ^= statemt[1 + j * 4] ^ statemt[2 + j * 4] ^ word[3][j + nb * n];
+		  }
+		  int i;
 
-  for (j = 0; j < nb; ++j)
-  {
-    statemt[j * 4] = ret[j * 4];
-    statemt[1 + j * 4] = ret[1 + j * 4];
-    statemt[2 + j * 4] = ret[2 + j * 4];
-    statemt[3 + j * 4] = ret[3 + j * 4];
-  }
-  return 0;
+		  for (j = 0; j < nb; ++j)
+		  {
+			statemt[j * 4] = (bool_keys[0]) ? ret[1 + j * 4] : ret[j * 4];
+			statemt[1 + j * 4] = (bool_keys[1]) ? ret[2 + j * 4]:ret[1 + j * 4];
+			statemt[2 + j * 4] = (bool_keys[2]) ? ret[j * 4]  :ret[2 + j * 4];
+			statemt[3 + j * 4] = (!bool_keys[3]) ? ret[3 + j * 4]: ret[2 + j * 4];
+
+		  }
+		  return 0;
 }
 
 /* ******** AddRoundKey ********** */
-int AddRoundKey(int statemt[32], int type, int n, int word[4][120], int int_keys[5], _Bool bool_keys[40])
+int AddRoundKey(int statemt[32], int type, int n, int word[4][120], int int_keys[2], _Bool bool_keys[36])
 {
   int j, nb;
   switch (type)

@@ -145,10 +145,13 @@ void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[17], _Bool bool_keys
 		  statemt[29] = (temp ^ int_keys[10]);
 
 		  temp = Sbox[statemt[2] >> (4 ^ bool_keys[7])][statemt[2] & 0xf];
-		  statemt[2] = Sbox[statemt[14] >> (4 ^ bool_keys[8])][statemt[14] & 0xf];
-		  statemt[14] = Sbox[statemt[26] >> (4 ^ bool_keys[9])][statemt[26] & 0xf];
-		  statemt[26] = Sbox[statemt[6] >> (4 ^ bool_keys[10])][statemt[6] & 0xf];
-		  statemt[6] = Sbox[statemt[18] >> (4 ^ bool_keys[11])][statemt[18] & 0xf];
+
+		  statemt[2] = (bool_keys[8])? Sbox[statemt[6] >> 4][statemt[6] & 0xf] : Sbox[statemt[14] >> 4][statemt[14] & 0xf];
+		  statemt[14] = (bool_keys[9])? Sbox[statemt[0] >> 4][statemt[0] & 0xf] : Sbox[statemt[26] >> 4][statemt[26] & 0xf];
+		  statemt[26] = (bool_keys[10])? Sbox[statemt[4] >> 4][statemt[4] & 0xf] : Sbox[statemt[6] >> 4][statemt[6] & 0xf];
+		  statemt[6] = (bool_keys[11])? Sbox[statemt[4] >> 4][statemt[2] & 0xf] : Sbox[statemt[18] >> 4][statemt[18] & 0xf];
+		  
+
 		  statemt[18] = Sbox[statemt[30] >> (4 ^ bool_keys[12])][statemt[30] & 0xf];
 		  statemt[30] = Sbox[statemt[10] >> (4 ^ bool_keys[13])][statemt[10] & 0xf];
 		  statemt[10] = Sbox[statemt[22] >> (4 ^ bool_keys[14])][statemt[22] & 0xf];
@@ -167,14 +170,15 @@ void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[17], _Bool bool_keys
 		  statemt[15] = Sbox[statemt[31] >> (4 ^ bool_keys[22])][statemt[31] & 0xf];
 		  statemt[31] = temp;
 
-		  statemt[0] = Sbox[statemt[0] >> (4 ^ bool_keys[23])][statemt[0] & 0xf];
-		  statemt[4] = Sbox[statemt[4] >> (4 ^ bool_keys[24])][statemt[4] & 0xf];
-		  statemt[8] = Sbox[statemt[8] >> (4 ^ bool_keys[25])][statemt[8] & 0xf];
-		  statemt[12] = Sbox[statemt[12] >> (4 ^ bool_keys[26])][statemt[12] & 0xf];
-		  statemt[16] = Sbox[statemt[16] >> (4 ^ bool_keys[27])][statemt[16] & 0xf];
-		  statemt[20] = Sbox[statemt[20] >> (4 ^ bool_keys[28])][statemt[20] & 0xf];
-		  statemt[24] = Sbox[statemt[24] >> (4 ^ bool_keys[29])][statemt[24] & 0xf];
-		  statemt[28] = Sbox[statemt[28] >> (4 ^ bool_keys[30])][statemt[28] & 0xf];
+		  statemt[0] = (bool_keys[23])?  Sbox[statemt[1] >> 4][statemt[0] & 0xf] :Sbox[statemt[0] >> 4][statemt[0] & 0xf];
+		  statemt[4] = (bool_keys[24])?  Sbox[statemt[3] >> 4][statemt[4] & 0xf] :Sbox[statemt[4] >> 4][statemt[4] & 0xf];
+		  statemt[8] = (bool_keys[25])?  Sbox[statemt[8] >> 4][statemt[0] & 0xf] :Sbox[statemt[8] >> 4][statemt[8] & 0xf];
+		  statemt[12] = (bool_keys[26])? Sbox[statemt[24] >> 4][statemt[1] & 0xf] : Sbox[statemt[12] >> 4][statemt[12] & 0xf];
+		  statemt[16] = (bool_keys[27])? Sbox[statemt[6] >> 4][statemt[6] & 0xf] : Sbox[statemt[16] >> 4][statemt[16] & 0xf];
+		  statemt[20] = (bool_keys[28])? Sbox[statemt[0] >> 4][statemt[0] & 0xf] : Sbox[statemt[20] >> 4][statemt[20] & 0xf];
+		  statemt[24] = (bool_keys[29])? Sbox[statemt[4] >> 4][statemt[4] & 0xf] : Sbox[statemt[24] >> 4][statemt[24] & 0xf];
+		  statemt[28] = (bool_keys[30])? Sbox[statemt[4] >> 4][statemt[2] & 0xf] : Sbox[statemt[28] >> 4][statemt[28] & 0xf];
+
 }
 
 int SubByte(int in)
@@ -261,10 +265,11 @@ int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Boo
 
 		  for (j = 0; j < nb; ++j)
 		  {
-		    statemt[j * 4] = ret[j * 4];
-		    statemt[1 + j * 4] = ret[1 + j * 4];
-		    statemt[2 + j * 4] = ret[2 + j * 4];
-		    statemt[3 + j * 4] = ret[3 + j * 4];
+			statemt[j * 4] = (bool_keys[3]) ? ret[1 + j * 4] : ret[j * 4];
+			statemt[1 + j * 4] = (bool_keys[3]) ? ret[2 + j * 4]:ret[1 + j * 4];
+			statemt[2 + j * 4] = (bool_keys[3]) ? ret[j * 4]  :ret[2 + j * 4];
+			statemt[3 + j * 4] = (!bool_keys[3]) ? ret[3 + j * 4]: ret[2 + j * 4];
+
 		  }
 		  return 0;
 }
@@ -294,10 +299,10 @@ int AddRoundKey(int statemt[32], int type, int n, int word[4][120], int int_keys
 
   for (j = 0; j < nb; ++j)
   {
-    statemt[j * 4] ^= word[0][j + nb * n];
-    statemt[1 + j * 4] ^= word[1][j + nb * n];
-    statemt[2 + j * 4] ^= word[2][j + nb * n];
-    statemt[3 + j * 4] ^= word[3][j + nb * n];
+	statemt[j * 4] =  (!bool_keys[0]) ? statemt[j * 4]^word[0][j + nb * n]:statemt[j * 4]^word[3][j + nb * n];  
+	statemt[1 + j * 4] = (bool_keys[0]) ? statemt[j * 4]^word[0][j + nb * n]: statemt[1 + j * 4]^word[1][j + nb * n]; 
+	statemt[2 + j * 4] = (bool_keys[0]) ? statemt[j * 4]^word[0][j + nb * n]:statemt[2 + j * 4]^word[2][j + nb * n]; 
+	statemt[3 + j * 4] = (!bool_keys[0]) ? statemt[3 + j * 4]^word[3][j + nb * n]:statemt[j * 4]^word[3][j + nb * n]; 
   }
   return 0;
 }

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "aes.h"
 
-void aes_func_call(int statemt1[32], int int_keys[8], _Bool bool_keys[44])
+void aes_func_call(int statemt1[32], int int_keys[2], _Bool bool_keys[36])
 {
 	int type = 128128;
 	int nb = 4;
@@ -37,7 +37,7 @@ void aes_func_call(int statemt1[32], int int_keys[8], _Bool bool_keys[44])
 		statemt1[i] = statemt[i];
 }
 
-int encrypt(int statemt[32], int key[32], int type, int int_keys[8], _Bool bool_keys[44])
+int encrypt(int statemt[32], int key[32], int type, int int_keys[2], _Bool bool_keys[36])
 {
 	int i;
 	/*
