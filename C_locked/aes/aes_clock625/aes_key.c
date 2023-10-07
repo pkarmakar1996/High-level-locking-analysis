@@ -11,7 +11,7 @@ const int Rcon0[30] = {
 	0xc5, 0x91};
 
 /*  **************** key expand ************************ */
-int KeySchedule(int type, int key[32], int int_keys[17], _Bool bool_keys[56])
+int KeySchedule(int type, int key[32], int int_keys[17], _Bool bool_keys[81])
 {
 
 	int nk, nb, round_val;

@@ -130,7 +130,7 @@ const int invSbox[16][16] = {
      0x55, 0x21, 0x0c, 0x7d}};
 
 /* ********* ByteSub & ShiftRow ********* */
-void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[17], _Bool bool_keys[56])
+void ByteSub_ShiftRow(int statemt[32], int nb, int int_keys[17], _Bool bool_keys[81])
 {
 			int temp;
 
@@ -183,7 +183,7 @@ int SubByte(int in)
 }
 
 /* ******** MixColumn ********** */
-int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Bool bool_keys[56])
+int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Bool bool_keys[81])
 {
 	int ret[8 * 4], j;
 		  register int x;
@@ -200,62 +200,62 @@ int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Boo
 
 		  for (j = 0; j < nb; ++j)
 		  {
-		    ret[j * 4] = (statemt[j * 4] << (1 ^ bool_keys[31]));
+		    ret[j * 4] = bool_keys[56] ?(statemt[j * 4] >> 7) : (statemt[j * 4] << (1 ^ bool_keys[31]))  ;
 
 		    if ((ret[j * 4] >> (8 ^ bool_keys[53])) == (1 ^ bool_keys[32]))
-		      ret[j * 4] ^= (283 ^ int_keys[11]);
+		      ret[j * 4] = bool_keys[57]? (ret[j * 4] & 23) : (ret[j * 4] ^ (283 ^ int_keys[11]));
 
-		    x = statemt[1 + j * 4];
-		    x ^= (x << (1 ^ int_keys[12]));
+		    x = bool_keys[80] ? x  :statemt[1 + j * 4];
+		    x = bool_keys[58] ? (x ^ ( x & 2))  : (x ^ (x << (1 ^ int_keys[12])));
 
 		    if ((x >> 8) == (1 ^ bool_keys[33]))
-		      ret[j * 4] ^= (x ^ (283 ^ bool_keys[44]));
+		      ret[j * 4] =  bool_keys[59] ? ret[j * 4] ^ (x | 55) : ret[j * 4] ^ (x ^ (283 ^ bool_keys[44]));
 		    else
-		      ret[j * 4] ^= (x^bool_keys[45]);
+		      ret[j * 4]  = bool_keys[60] ? ret[j * 4] ^ (x << 7) : ret[j * 4] ^  (x ^ bool_keys[45]);
 
-		    ret[j * 4] ^= statemt[2 + j * 4] ^ statemt[3 + j * 4] ^ word[0][j + nb * n] ^ bool_keys[46];
-		    ret[1 + j * 4] = (statemt[1 + j * 4] << (1 ^ bool_keys[34]));
+		    ret[j * 4] = bool_keys[61] ? ret[j * 4] : ret[j * 4] ^ statemt[2 + j * 4] ^ statemt[3 + j * 4] ^ word[0][j + nb * n] ^ bool_keys[46];
+		    ret[1 + j * 4] = bool_keys[62] ?(statemt[1 + j * 4] ^ 56 ):(statemt[1 + j * 4] << (1 ^ bool_keys[34]));
 
 		    if ((ret[1 + j * 4] >> (8 ^ int_keys[13])) == (1 ^ bool_keys[35]))
-		      ret[1 + j * 4] ^= (283 ^ bool_keys[48]);
+		      ret[1 + j * 4] = bool_keys[63] ? (ret[1 + j * 4] | 83) : ret[1 + j * 4] ^(283 ^ bool_keys[48]);
 
 		    x = statemt[2 + j * 4];
-		    x ^= (x << (1 ^ bool_keys[36]));
+		    x = bool_keys[64] ? (x | 1) : x ^ (x << (1 ^ bool_keys[36]));
 
 		    if ((x >> (8 ^ int_keys[14])) == (1 ^ bool_keys[37]))
-		      ret[1 + j * 4] ^= (x ^ 283 ^ bool_keys[49]);
+		      ret[1 + j * 4] = bool_keys[65] ? ret[1 + j * 4] :ret[1 + j * 4] ^ (x ^ 283 ^ bool_keys[49]);
 		    else
-		      ret[1 + j * 4] ^= (x ^ bool_keys[47]);
+		      ret[1 + j * 4] = bool_keys[66]  ? ret[1 + j * 4]|(x <<1) : ret[1 + j * 4] ^ (x ^ bool_keys[47]);
 
-		    ret[1 + j * 4] ^= statemt[3 + j * 4] ^ statemt[j * 4] ^ word[1][j + nb * n] ^ bool_keys[52];
-		    ret[2 + j * 4] = (statemt[2 + j * 4] << (1 ^ bool_keys[38]));
+		    ret[1 + j * 4] = bool_keys[67] ? ret[1 + j * 4] : ret[1 + j * 4] ^ statemt[3 + j * 4] ^ statemt[j * 4] ^ word[1][j + nb * n] ^ bool_keys[52];
+		    ret[2 + j * 4] = bool_keys[68] ? (statemt[2 + j * 4] >> 15) : (statemt[2 + j * 4] << (1 ^ bool_keys[38]));
 
 		    if ((ret[2 + j * 4] >> (8 ^ int_keys[15])) == (1 ^ bool_keys[39]))
-		      ret[2 + j * 4] ^= (283 ^ int_keys[7]);
+		      ret[2 + j * 4] = bool_keys[69] ? (ret[2 + j * 4] | 83) : ret[2 + j * 4] ^ (283 ^ int_keys[7]);
 
 		    x = statemt[3 + j * 4];
-		    x ^= (x << (1 ^ bool_keys[40]));
+		    x = bool_keys[70] ? (x|(x>>4)) : (x ^ (x << (1 ^ bool_keys[40])));
 
 		    if ((x >> (8 ^ int_keys[16])) == (1 ^ bool_keys[41]))
-		      ret[2 + j * 4] ^= (x ^ 283 ^ bool_keys[50]);
+		      ret[2 + j * 4] = bool_keys[71] ? (ret[2 + j * 4] & 3) : (ret[2 + j * 4] ^ (x ^ 283 ^ bool_keys[50]));
 		    else
-		      ret[2 + j * 4] ^= x;
+		      ret[2 + j * 4] =   bool_keys[72] ? (ret[2 + j * 4] ^ 1) : (ret[2 + j * 4] ^ x);
 
-		    ret[2 + j * 4] ^= statemt[j * 4] ^ statemt[1 + j * 4] ^ word[2][j + nb * n];
-		    ret[3 + j * 4] = (statemt[3 + j * 4] << 1);
+		    ret[2 + j * 4] = bool_keys[73] ? ret[2 + j * 4] : ret[2 + j * 4]^statemt[j * 4] ^ statemt[1 + j * 4] ^ word[2][j + nb * n];
+		    ret[3 + j * 4] = bool_keys[74] ? (statemt[3 + j * 4] >>4) : (statemt[3 + j * 4] << 1);
 
 		    if ((ret[3 + j * 4] >> (8 ^ bool_keys[54])) == (1 ^ bool_keys[42]))
-		      ret[3 + j * 4] ^= (283 ^ bool_keys[51]);
+		      ret[3 + j * 4] = bool_keys[75] ? (ret[3 + j * 4]|8) : (ret[3 + j * 4] ^ (283 ^ bool_keys[51]));
 
 		    x = statemt[j * 4];
-		    x ^= (x << (1 ^ bool_keys[43]));
+		    x = bool_keys[76] ? x : x ^ (x << (1 ^ bool_keys[43]));
 
 		    if ((x >> (8 ^ bool_keys[55])) == (1 ^ int_keys[6]))
-		      ret[3 + j * 4] ^= (x ^ 283 ^ int_keys[5]);
+		      ret[3 + j * 4] =  bool_keys[77] ? ret[3 + j * 4] : ret[3 + j * 4] ^ (x ^ 283 ^ int_keys[5]);
 		    else
-		      ret[3 + j * 4] ^= x;
+		      ret[3 + j * 4] = bool_keys[78] ? x : ret[3 + j * 4] ^ x;
 
-		    ret[3 + j * 4] ^= statemt[1 + j * 4] ^ statemt[2 + j * 4] ^ word[3][j + nb * n];
+		    ret[3 + j * 4] = bool_keys[79] ? statemt[1 + j * 4]  : (ret[3 + j * 4] ^ statemt[1 + j * 4] ^ statemt[2 + j * 4] ^ word[3][j + nb * n]);
 		  }
 		  int i;
 
@@ -270,7 +270,7 @@ int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Boo
 }
 
 /* ******** AddRoundKey ********** */
-int AddRoundKey(int statemt[32], int type, int n, int word[4][120], int int_keys[17], _Bool bool_keys[56])
+int AddRoundKey(int statemt[32], int type, int n, int word[4][120], int int_keys[17], _Bool bool_keys[81])
 {
   int j, nb;
   switch (type)

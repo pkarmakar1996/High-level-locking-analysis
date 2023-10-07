@@ -11,7 +11,7 @@ const int Rcon0[30] = {
 	0xc5, 0x91};
 
 /*  **************** key expand ************************ */
-int KeySchedule(int type, int key[32], int int_keys[11], _Bool bool_keys[48])
+int KeySchedule(int type, int key[32], int int_keys[8], _Bool bool_keys[59])
 {
 
 	int nk, nb, round_val;
@@ -87,12 +87,12 @@ int KeySchedule(int type, int key[32], int int_keys[11], _Bool bool_keys[48])
 			temp[2] = word[2][j - 1];
 			temp[3] = word[3][j - 1];
 		}
-		if (nk > 6 && j % nk == (4 ^ int_keys[8]))
+		if (nk > 6 && j % nk == 4)
 			for (i = 0; i < 4; ++i)
 				temp[i] = SubByte(temp[i]);
 
 		for (i = 0; i < 4; ++i)
-			word[i][j] = (word[i][j - nk] ^ temp[i] ^ int_keys[9]);
+			word[i][j] = word[i][j - nk] ^ temp[i];
 	}
 
 	return 0;
