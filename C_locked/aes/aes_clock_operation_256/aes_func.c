@@ -237,7 +237,7 @@ int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Boo
 		    x = bool_keys[5] ? [3 - j + 5]:[3 + j * 4];
 		    x = bool_keys[70] ? (x|(x>>4)) : (x ^ (x << (1 ^ bool_keys[40])));
 
-		    if ((x >> (8 ^ int_keys[16])) == (1 ^ bool_keys[41]))
+		    if ((x >> (8 ^ int_keys[16])) == (1))
 		      ret[2 + j * 4] = bool_keys[71] ? (ret[2 + j * 4] & 3) : (ret[2 + j * 4] ^ (x ^ 283));
 		    else
 		      ret[2 + j * 4] =   bool_keys[72] ? (ret[2 + j * 4] ^ 1) : (ret[2 + j * 4] ^ x);
@@ -251,7 +251,7 @@ int MixColumn_AddRoundKey(int statemt[32], int nb, int n, int int_keys[17], _Boo
 		    x = bool_keys[6] ? [j - 4] : [j * 4];
 		    x = bool_keys[76] ? x : x ^ (x << (1));
 
-		    if ((x >> (8 ^ bool_keys[55])) == (1))
+		    if ((x >> (8)) == (1))
 		      ret[3 + j * 4] =  bool_keys[77] ? ret[3 + j * 4] : ret[3 + j * 4] ^ (x ^ 283 );
 		    else
 		      ret[3 + j * 4] = bool_keys[78] ? x : ret[3 + j * 4] ^ x;
